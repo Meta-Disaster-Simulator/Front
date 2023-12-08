@@ -61,7 +61,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
-  //const cookies = new Cookies();
+//  const cookies = new Cookies();
 
   const api = axios.create({
     baseURL: 'http://54.180.145.34:8080',
@@ -91,19 +91,19 @@ const Login = () => {
     }
   })
   .then((res) => {
-    console.log(res.data); // 서버로부터의 응답 데이터 로그
-    if(res.data.code === 200) {
+    console.log(res); // 서버로부터의 응답 데이터 로그
+    if(res.status === 200) {
       console.log("로그인 성공");
       // 서버로부터 토큰을 받아오는 경우
-      const { accessToken, refreshToken } = res.data;
-  
-      // // 쿠키에 액세스 토큰과 리프레시 토큰을 저장
-      // cookies.set('accessToken', accessToken, { path: '/', maxAge: 3600 }); // 1시간 동안 유효
-      // cookies.set('refreshToken', refreshToken, { path: '/', maxAge: 86400 }); // 24시간 동안 유효
-
+      const {accessToken, refreshToken} = res.data;
       // 쿠키에 액세스 토큰과 리프레시 토큰을 저장
+      console.log(accessToken);
+      console.log(refreshToken);
       document.cookie = `accessToken=${accessToken}; path=/; max-age=3600`; // 1시간 동안 유효
       document.cookie = `refreshToken=${refreshToken}; path=/; max-age=86400`; // 24시간 동안 유효
+
+      // cookies.set('accessToken', accessToken, { path: '/', maxAge: 3600 }); // 1시간 동안 유효
+      // cookies.set('refreshToken', refreshToken, { path: '/', maxAge: 86400 }); // 24시간 동안 유효
       setMsg("");
     }
   })

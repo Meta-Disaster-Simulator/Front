@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // 추가
+import { Link, useNavigate } from "react-router-dom";
 import styled from 'styled-components';
 import axios from 'axios'
 //import { Cookies } from "react-cookie";
@@ -61,6 +61,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
+  const navigate = useNavigate(); // useNavigate 훅 사용
 //  const cookies = new Cookies();
 
   const api = axios.create({
@@ -102,6 +103,7 @@ const Login = () => {
       document.cookie = `accessToken=${accessToken}; path=/; max-age=3600`; // 1시간 동안 유효
       document.cookie = `refreshToken=${refreshToken}; path=/; max-age=86400`; // 24시간 동안 유효
 
+      navigate('/game');
       // cookies.set('accessToken', accessToken, { path: '/', maxAge: 3600 }); // 1시간 동안 유효
       // cookies.set('refreshToken', refreshToken, { path: '/', maxAge: 86400 }); // 24시간 동안 유효
       setMsg("");

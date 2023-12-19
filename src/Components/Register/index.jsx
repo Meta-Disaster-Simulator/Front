@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Link } from "react-router-dom"; // 추가
+import { Link, useNavigate } from "react-router-dom";
 import styled from 'styled-components';
+import axios from 'axios'
 
 // 스타일이 적용된 입력 필드 컴포넌트
 const StyledInput = styled.input`
@@ -107,16 +108,19 @@ const LogoContainer = styled.div`
 
 
 const Register = () => {
-  const [Email, setEmail] = useState("");
-  const [Name, setName] = useState("");
-  const [Password, setPassword] = useState("");
-  const [ConfirmPassword, setConfirmPassword] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [id, setId] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState("");
+  const navigate = useNavigate(); // useNavigate 훅 사용
 
-  const onEmailHandler = (event) => {
-      setEmail(event.currentTarget.value);
+  const onNicknameHandler = (event) => {
+      setNickname(event.currentTarget.value);
   }
-  const onNameHandler = (event) => {
-      setName(event.currentTarget.value);
+  const onIdHandler = (event) => {
+      setId(event.currentTarget.value);
   }
   const onPasswordHandler = (event) => {
       setPassword(event.currentTarget.value);
@@ -124,38 +128,115 @@ const Register = () => {
   const onConfirmPasswordHandler = (event) => {
       setConfirmPassword(event.currentTarget.value);
   }
+
+  const api = axios.create({
+    baseURL: 'http://54.180.145.34:8080', // https로 바꿔야함 ?
+    withCredentials: true
+  });
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setLoading(true); // 로딩 시작
+
+    // 아이디 검사 - 5글자 이상, 특수문자 없음
+    const idRegex = /^[A-Za-z0-9]{5,}$/;
+    if (!idRegex.test(id)) {
+      setLoading(false);
+      return alert("아이디는 5글자 이상이어야 하며, 특수문자를 포함할 수 없습니다.");
+    }
+
+    // 비밀번호 검사 - 6글자 이상
+    if (password.length < 6) {
+      setLoading(false);
+      return alert("비밀번호는 6글자 이상이어야 합니다.");
+    }
+    if (!id) {
+      setLoading(false); // 로딩 종료
+      return alert("아이디를 입력하세요.");
+    } else if (!password) {
+      setLoading(false); // 로딩 종료
+      return alert("패스워드를 입력하세요.");
+    } else if (!confirmPassword) {
+      setLoading(false); // 로딩 종료
+      return alert("패스워드 확인을 입력하세요.");
+    } else if (!nickname) {
+      setLoading(false); // 로딩 종료
+      return alert("닉네임을 입력하세요.");
+    }
+    
+    if(password !== confirmPassword){
+        setLoading(false); // 로딩 종료
+        return alert('비밀번호와 비밀번호 확인이 같지 않습니다.')
+    }
+
+  let body = {
+    "id" : id,
+    "password": password,
+    "nickname": nickname
+  };
+
+  try {
+    const res = await api.post("/signup", body, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
+    console.log(res)
+    if(res.status === 200) {
+      console.log("회원가입 성공");
+      navigate('/');
+      setMsg("");
+    }
+  } catch(error) {
+    setLoading(false); // 로딩 종료
+    if (error.response && error.response.status === 403) {
+      // 403 에러가 발생했을 때의 처리
+      alert("[Error:403] 회원가입 정보를 다시 입력하세요."); // 사용자에게 알림
+    } else {
+      // 다른 종류의 에러 처리
+      console.error("회원가입 에러", error);
+      setMsg("회원가입에 실패했습니다. 서버 에러가 발생했습니다.");
+    }
+  }
+
+  setLoading(false); // 로딩 종료
+  };
+
+
   return (
     <PageContainer>
         <FormContainer>
             <LogoContainer />
             <Title>회원가입</Title>
             <StyledInput
-                type='email'
-                value={Email}
-                onChange={onEmailHandler}
-                placeholder="이메일"
+                type='text'
+                value={nickname}
+                onChange={onNicknameHandler}
+                placeholder="닉네임"
             />
             <StyledInput
                 type='text'
-                value={Name}
-                onChange={onNameHandler}
-                placeholder="이름"
+                value={id}
+                onChange={onIdHandler}
+                placeholder="아이디"
             />
             <StyledInput
                 type='password'
-                value={Password}
+                value={password}
                 onChange={onPasswordHandler}
                 placeholder="비밀번호"
             />
             <StyledInput
                 type='password'
-                value={ConfirmPassword}
+                value={confirmPassword}
                 onChange={onConfirmPasswordHandler}
                 placeholder="비밀번호 확인"
             />
-            <StyledButton formAction=''>
+            <StyledButton onClick={handleSubmit} disabled={loading} formAction=''>
                 회원가입
             </StyledButton>
+            <StyledLink to="/">뒤로가기</StyledLink>
         </FormContainer>
     </PageContainer>
 );

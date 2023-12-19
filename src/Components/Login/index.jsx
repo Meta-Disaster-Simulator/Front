@@ -131,10 +131,10 @@ const Login = () => {
     baseURL: 'http://54.180.145.34:8080', // https로 바꿔야함
     withCredentials: true
   });
-
+  
+// *****************로그인 성공 시 사용자 정보 받아오기******************* //
   const axiosStat = async () => {
     const response = await api.post("/stat", { id })
-    // .then((response) => {
     console.log(response);
     console.log(response.data);
     const { nickname, score } = response.data;
@@ -143,19 +143,18 @@ const Login = () => {
     console.log(nickname);
 
     navigate('/game');
-  // })
   }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setLoading(true); // 로딩 시작
+    setLoading(true);
 
     if (!id) {
-      setLoading(false); // 로딩 종료
-      return alert("ID를 입력하세요.");
+      setLoading(false);
+      return alert("아이디를 입력하세요.");
     } else if (!password) {
-      setLoading(false); // 로딩 종료
-      return alert("Password를 입력하세요.");
+      setLoading(false);
+      return alert("패스워드를 입력하세요.");
     }
 
   let body = {
@@ -173,27 +172,12 @@ const Login = () => {
     console.log(res)
     if(res.status === 200) {
       console.log("로그인 성공");
-      // 서버로부터 토큰을 받아오는 경우
+
       const {accessToken, refreshToken} = res.data;
-      // 쿠키에 액세스 토큰과 리프레시 토큰을 저장
       document.cookie = `accessToken=${accessToken}; path=/; max-age=3600`; // Secure; HttpOnly 제거
       document.cookie = `refreshToken=${refreshToken}; path=/; max-age=86400`;/// 24시간 동안 유효
       setUserId(id); // 로그인 성공 시 사용자 아이디 저장
 
-      // *****************로그인 성공 시 사용자 정보 받아오기******************* //
-      // 토큰과 함께 id를 서버에 보내서 해당 id가 갖고있는 닉네임과 점수를 받아야 한다.
-      // get 요청이고, url은 /stat
-      // 요청 보낼 때 바디로 Key는 1개(id) 밖에 없는 JSON을 실어서 돌려준다.
-      // 서버로부터 바디는 nickname과 score를 받아온다.
-      // api.post("/stat", { id })
-      //   .then((response) => {
-      //   console.log(response);
-      //   console.log(response.data);
-      //   const { nickname, score } = response.data;
-      //   setunityNickName(nickname);
-      //   setunityScore(score);
-      //   console.log(nickname);
-      // })
       try {
         axiosStat()
       }
@@ -204,16 +188,58 @@ const Login = () => {
       setMsg("");
     }
   } catch(error) {
-    setLoading(false); // 로딩 종료
+    setLoading(false);
     if (error.response && error.response.status === 403) {
-      // 403 에러가 발생했을 때의 처리
-      alert("[Error:403] 로그인 정보를 다시 입력하세요."); // 사용자에게 알림
+      alert("[Error:403] 로그인 정보를 다시 입력하세요.");
     } else {
       // 다른 종류의 에러 처리
       console.error("로그인 에러", error);
       setMsg("로그인에 실패했습니다. 서버 에러가 발생했습니다.");
     }
   }
+
+  setLoading(false);
+  };
+
+  useEffect(() => {
+    if (msg) {
+      setTimeout(() => {
+        setMsg("");
+      }, 1500);
+    }
+  }, [msg]);
+
+  return (
+  <PageContainer>
+    <FormContainer>
+      <LogoContainer />
+      <Title>메타 재난 시뮬레이션</Title>
+      {/*<Subtitle>소제목 넣으면 됨</Subtitle>*/}
+      <StyledInput
+        type="text"
+        id="username"
+        placeholder="사용자 이름"
+        value={id}
+        onChange={(e) => setId(e.target.value)}
+      />
+      <StyledInput
+        type="password"
+        id="password"
+        placeholder="비밀번호"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <StyledButton onClick={handleSubmit} disabled={loading}>로그인</StyledButton>
+      <StyledLink to="/register">회원가입</StyledLink>
+    </FormContainer>
+  </PageContainer>
+  );
+};
+
+export default Login;
+      // cookies.set('accessToken', accessToken, { path: '/', maxAge: 3600 }); // 1시간 동안 유효
+      // cookies.set('refreshToken', refreshToken, { path: '/', maxAge: 86400 }); // 24시간 동안 유효
+
 
   // .then((res) => {
   //   console.log(res); // 서버로부터의 응답 데이터 로그
@@ -259,45 +285,3 @@ const Login = () => {
   //     setMsg("로그인에 실패했습니다. 서버 에러가 발생했습니다.");
   //   }
   // });
-
-  setLoading(false); // 로딩 종료
-  };
-
-  useEffect(() => {
-    if (msg) {
-      setTimeout(() => {
-        setMsg("");
-      }, 1500);
-    }
-  }, [msg]);
-
-  return (
-  <PageContainer>
-    <FormContainer>
-      <LogoContainer />
-      <Title>메타 재난 시뮬레이션</Title>
-      {/*<Subtitle>소제목 넣으면 됨</Subtitle>*/}
-      <StyledInput
-        type="text"
-        id="username"
-        placeholder="사용자 이름"
-        value={id}
-        onChange={(e) => setId(e.target.value)}
-      />
-      <StyledInput
-        type="password"
-        id="password"
-        placeholder="비밀번호"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <StyledButton onClick={handleSubmit} disabled={loading}>로그인</StyledButton>
-      <StyledLink to="/register">회원가입</StyledLink>
-    </FormContainer>
-  </PageContainer>
-  );
-};
-
-export default Login;
-      // cookies.set('accessToken', accessToken, { path: '/', maxAge: 3600 }); // 1시간 동안 유효
-      // cookies.set('refreshToken', refreshToken, { path: '/', maxAge: 86400 }); // 24시간 동안 유효

@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // 추가
-import styled from 'styled-components';
+import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios'
-//import { Cookies } from "react-cookie";
+import styled from 'styled-components';
 
 // 스타일이 적용된 입력 필드 컴포넌트
 const StyledInput = styled.input`
   display: block;
   width: 100%;
   padding: 10px;
+  
   margin-bottom: 15px; // 각 요소 사이에 여유 공간을 추가
   box-sizing: border-box; // padding과 border가 width에 포함되도록 설정
   border: 1px solid #ccc;
@@ -44,27 +44,88 @@ const StyledLink = styled(Link)`
   }
 `;
 
-// 폼 컨테이너 스타일링
+// 제목을 위한 스타일드 컴포넌트
+const Title = styled.h1`
+  font-size: 2rem; /* 글자 크기 조정 */
+  color: #333; /* 글자 색상 수정 */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* 글꼴 가족 설정 */
+  text-align: center; /* 텍스트 중앙 정렬 */
+  font-weight: bold; /* 글자 두께 */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* 텍스트에 그림자 효과 추가 */
+  margin: 0 0 1.5rem 0; /* 제목 아래에만 마진을 줘서 폼과 간격을 둠 */
+`;
+
+// 소제목을 위한 스타일드 컴포넌트
+const Subtitle = styled.h2`
+  font-size: 1.25rem; /* 글자 크기 조정 */
+  color: #555; /* 글자 색상 약간 어둡게 조정 */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* 글꼴 가족 설정 */
+  text-align: center; /* 텍스트 중앙 정렬 */
+  font-weight: normal; /* 글자 두께 */
+  margin: 0 0 2rem 0; /* 소제목 아래에 마진을 더 줘서 폼과 간격을 둠 */
+  letter-spacing: 0.5px; /* 글자 사이 간격 조정 */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* 텍스트에 그림자 효과 추가 */
+`;
+
+
+// 전체 페이지를 감싸는 컨테이너에 배경 이미지 추가
+const PageContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+  background-image: url('image/back5.png'); /* 배경 이미지 경로 설정 */
+  background-size: cover; /* 이미지가 전체 배경을 커버하도록 설정 */
+  background-position: center; /* 이미지가 중앙에 오도록 설정 */
+  background-repeat: no-repeat; /* 이미지가 반복되지 않도록 설정 */
+`;
+
+// 폼 컨테이너 스타일링 수정
 const FormContainer = styled.div`
   width: 100%;
   max-width: 400px;
-  margin: 0 auto;
-  padding: 20px;
+  background: #f0f0f0; /* 하얀 배경을 연한 회색으로 변경 */
+  margin: 1rem auto; /* 상단 여백 추가 */
+  padding: 2rem;
+  background: #f0f0f0; /* 하얀 배경을 연한 회색으로 변경 */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   background: #fff;
+  position: relative; /* 타이틀을 포지셔닝하기 위해 relative 설정 */
 `;
 
+const LogoContainer = styled.div`
+  background-image: url('image/안전모.png'); // 로고 이미지 경로 설정
+  background-size: contain; // 이미지가 컨테이너 내에 맞도록 조정
+  background-position: center center; // 이미지 위치를 중앙으로 설정
+  background-repeat: no-repeat; // 이미지가 반복되지 않도록 설정
+  width: 100px; // 로고 크기를 줄임
+  height: 100px; // 로고 크기를 줄임
+  margin: 20px auto; // 상단과 하단 여백을 줌, 로고를 수평 중앙 정렬
+`;
+
+// // 이미지를 위한 스타일드 컴포넌트
+// const ImageContainer = styled.div`
+//   background-image: url('image/metalogo.png'); // 이미지 경로 설정
+//   background-size: contain; // 이미지가 컨테이너를 꽉 채우도록 설정
+//   background-position: center center; // 이미지 위치를 중앙으로 설정
+//   background-repeat: no-repeat; // 이미지가 반복되지 않도록 설정
+//   width: 100%; // 또는 필요한 크기로 설정
+//   height: 100px; // 필요한 높이로 설정
+// `;
 
 const Login = () => {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
-  //const cookies = new Cookies();
+  const navigate = useNavigate(); // useNavigate 훅 사용
+//  const cookies = new Cookies();
 
   const api = axios.create({
-    baseURL: 'http://54.180.145.34:8080',
+    baseURL: 'http://54.180.145.34:8080', // https로 바꿔야함
     withCredentials: true
   });
 
@@ -91,19 +152,19 @@ const Login = () => {
     }
   })
   .then((res) => {
-    console.log(res.data); // 서버로부터의 응답 데이터 로그
-    if(res.data.code === 200) {
+    console.log(res); // 서버로부터의 응답 데이터 로그
+    if(res.status === 200) {
       console.log("로그인 성공");
       // 서버로부터 토큰을 받아오는 경우
-      const { accessToken, refreshToken } = res.data;
-  
-      // // 쿠키에 액세스 토큰과 리프레시 토큰을 저장
+      const {accessToken, refreshToken} = res.data;
+      // 쿠키에 액세스 토큰과 리프레시 토큰을 저장
+      console.log(accessToken);
+      console.log(refreshToken);
+      document.cookie = `accessToken=${accessToken}; path=/; max-age=3600; Secure; HttpOnly`; // 1시간 동안 유효
+      document.cookie = `refreshToken=${refreshToken}; path=/; max-age=86400; Secure; HttpOnly`;// 24시간 동안 유효
+      navigate('/game');
       // cookies.set('accessToken', accessToken, { path: '/', maxAge: 3600 }); // 1시간 동안 유효
       // cookies.set('refreshToken', refreshToken, { path: '/', maxAge: 86400 }); // 24시간 동안 유효
-
-      // 쿠키에 액세스 토큰과 리프레시 토큰을 저장
-      document.cookie = `accessToken=${accessToken}; path=/; max-age=3600`; // 1시간 동안 유효
-      document.cookie = `refreshToken=${refreshToken}; path=/; max-age=86400`; // 24시간 동안 유효
       setMsg("");
     }
   })
@@ -131,7 +192,11 @@ const Login = () => {
   }, [msg]);
 
   return (
+  <PageContainer>
     <FormContainer>
+      <LogoContainer />
+      <Title>메타 재난 시뮬레이션</Title>
+      {/*<Subtitle>소제목 넣으면 됨</Subtitle>*/}
       <StyledInput
         type="text"
         id="username"
@@ -149,6 +214,7 @@ const Login = () => {
       <StyledButton onClick={handleSubmit} disabled={loading}>로그인</StyledButton>
       <StyledLink to="/register">회원가입</StyledLink>
     </FormContainer>
+  </PageContainer>
   );
 };
 

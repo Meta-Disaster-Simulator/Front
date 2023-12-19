@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios'
 import styled from 'styled-components';
+import { useUser } from '../../UserContext';
 
 // 스타일이 적용된 입력 필드 컴포넌트
 const StyledInput = styled.input`
@@ -117,17 +118,33 @@ const LogoContainer = styled.div`
 // `;
 
 const Login = () => {
-  const [id, setId] = useState('');
+  const { setunityScore } = useUser();
+  const { setunityNickName } = useUser();
+  const { setUserId } = useUser();
+  const [id, setId] = useState(''); // 사용자 아이디 상태 추가
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
   const navigate = useNavigate(); // useNavigate 훅 사용
-//  const cookies = new Cookies();
 
   const api = axios.create({
     baseURL: 'http://54.180.145.34:8080', // https로 바꿔야함
     withCredentials: true
   });
+
+  const axiosStat = async () => {
+    const response = await api.post("/stat", { id })
+    // .then((response) => {
+    console.log(response);
+    console.log(response.data);
+    const { nickname, score } = response.data;
+    setunityNickName(nickname);
+    setunityScore(score);
+    console.log(nickname);
+
+    navigate('/game');
+  // })
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -146,29 +163,47 @@ const Login = () => {
     "password": password
   };
 
-  api.post("/login", body, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  })
-  .then((res) => {
-    console.log(res); // 서버로부터의 응답 데이터 로그
+  try {
+    const res = await api.post("/login", body, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
+    console.log(res)
     if(res.status === 200) {
       console.log("로그인 성공");
       // 서버로부터 토큰을 받아오는 경우
       const {accessToken, refreshToken} = res.data;
       // 쿠키에 액세스 토큰과 리프레시 토큰을 저장
-      console.log(accessToken);
-      console.log(refreshToken);
-      document.cookie = `accessToken=${accessToken}; path=/; max-age=3600; Secure; HttpOnly`; // 1시간 동안 유효
-      document.cookie = `refreshToken=${refreshToken}; path=/; max-age=86400; Secure; HttpOnly`;// 24시간 동안 유효
-      navigate('/game');
-      // cookies.set('accessToken', accessToken, { path: '/', maxAge: 3600 }); // 1시간 동안 유효
-      // cookies.set('refreshToken', refreshToken, { path: '/', maxAge: 86400 }); // 24시간 동안 유효
+      document.cookie = `accessToken=${accessToken}; path=/; max-age=3600`; // Secure; HttpOnly 제거
+      document.cookie = `refreshToken=${refreshToken}; path=/; max-age=86400`;/// 24시간 동안 유효
+      setUserId(id); // 로그인 성공 시 사용자 아이디 저장
+
+      // *****************로그인 성공 시 사용자 정보 받아오기******************* //
+      // 토큰과 함께 id를 서버에 보내서 해당 id가 갖고있는 닉네임과 점수를 받아야 한다.
+      // get 요청이고, url은 /stat
+      // 요청 보낼 때 바디로 Key는 1개(id) 밖에 없는 JSON을 실어서 돌려준다.
+      // 서버로부터 바디는 nickname과 score를 받아온다.
+      // api.post("/stat", { id })
+      //   .then((response) => {
+      //   console.log(response);
+      //   console.log(response.data);
+      //   const { nickname, score } = response.data;
+      //   setunityNickName(nickname);
+      //   setunityScore(score);
+      //   console.log(nickname);
+      // })
+      try {
+        axiosStat()
+      }
+      catch(error)  {
+        console.error("사용자 정보 요청 에러", error);
+      };
+
       setMsg("");
     }
-  })
-  .catch((error) => {
+  } catch(error) {
     setLoading(false); // 로딩 종료
     if (error.response && error.response.status === 403) {
       // 403 에러가 발생했을 때의 처리
@@ -178,7 +213,52 @@ const Login = () => {
       console.error("로그인 에러", error);
       setMsg("로그인에 실패했습니다. 서버 에러가 발생했습니다.");
     }
-  });
+  }
+
+  // .then((res) => {
+  //   console.log(res); // 서버로부터의 응답 데이터 로그
+  //   if(res.status === 200) {
+  //     console.log("로그인 성공");
+  //     // 서버로부터 토큰을 받아오는 경우
+  //     const {accessToken, refreshToken} = res.data;
+  //     // 쿠키에 액세스 토큰과 리프레시 토큰을 저장
+  //     document.cookie = `accessToken=${accessToken}; path=/; max-age=3600`; // Secure; HttpOnly 제거
+  //     document.cookie = `refreshToken=${refreshToken}; path=/; max-age=86400`;/// 24시간 동안 유효
+  //     setUserId(id); // 로그인 성공 시 사용자 아이디 저장
+
+  //     // *****************로그인 성공 시 사용자 정보 받아오기******************* //
+  //     // 토큰과 함께 id를 서버에 보내서 해당 id가 갖고있는 닉네임과 점수를 받아야 한다.
+  //     // get 요청이고, url은 /stat
+  //     // 요청 보낼 때 바디로 Key는 1개(id) 밖에 없는 JSON을 실어서 돌려준다.
+  //     // 서버로부터 바디는 nickname과 score를 받아온다.
+  //     api.post("/stat", { id })
+  //       .then((response) => {
+  //       console.log(response);
+  //       console.log(response.data);
+  //       const { nickname, score } = response.data;
+  //       setunityNickName(nickname);
+  //       setunityScore(score);
+  //       console.log(nickname);
+  //     })
+  //     .catch((error) => {
+  //       console.error("사용자 정보 요청 에러", error);
+  //     });
+
+  //     navigate('/game');
+  //     setMsg("");
+  //   }
+  // })
+  // .catch((error) => {
+  //   setLoading(false); // 로딩 종료
+  //   if (error.response && error.response.status === 403) {
+  //     // 403 에러가 발생했을 때의 처리
+  //     alert("[Error:403] 로그인 정보를 다시 입력하세요."); // 사용자에게 알림
+  //   } else {
+  //     // 다른 종류의 에러 처리
+  //     console.error("로그인 에러", error);
+  //     setMsg("로그인에 실패했습니다. 서버 에러가 발생했습니다.");
+  //   }
+  // });
 
   setLoading(false); // 로딩 종료
   };
@@ -219,6 +299,5 @@ const Login = () => {
 };
 
 export default Login;
-
-
-
+      // cookies.set('accessToken', accessToken, { path: '/', maxAge: 3600 }); // 1시간 동안 유효
+      // cookies.set('refreshToken', refreshToken, { path: '/', maxAge: 86400 }); // 24시간 동안 유효

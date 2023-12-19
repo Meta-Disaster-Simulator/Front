@@ -125,7 +125,7 @@ const Login = () => {
 //  const cookies = new Cookies();
 
   const api = axios.create({
-    baseURL: 'http://54.180.145.34:8080',
+    baseURL: 'http://54.180.145.34:8080', // https로 바꿔야함
     withCredentials: true
   });
 
@@ -160,9 +160,8 @@ const Login = () => {
       // 쿠키에 액세스 토큰과 리프레시 토큰을 저장
       console.log(accessToken);
       console.log(refreshToken);
-      document.cookie = `accessToken=${accessToken}; path=/; max-age=3600`; // 1시간 동안 유효
-      document.cookie = `refreshToken=${refreshToken}; path=/; max-age=86400`; // 24시간 동안 유효
-
+      document.cookie = `accessToken=${accessToken}; path=/; max-age=3600; Secure; HttpOnly`; // 1시간 동안 유효
+      document.cookie = `refreshToken=${refreshToken}; path=/; max-age=86400; Secure; HttpOnly`;// 24시간 동안 유효
       navigate('/game');
       // cookies.set('accessToken', accessToken, { path: '/', maxAge: 3600 }); // 1시간 동안 유효
       // cookies.set('refreshToken', refreshToken, { path: '/', maxAge: 86400 }); // 24시간 동안 유효

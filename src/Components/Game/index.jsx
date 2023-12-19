@@ -9,10 +9,10 @@ const Game = () => {
     // sendMessage, // unity 함수를 호출하기 위한 sendMessage 추가
     UNSAFE__detachAndUnloadImmediate: detachAndUnloadImmediate,
     } = useUnityContext({
-    loaderUrl: '/build/meta.loader.js',
-    dataUrl: '/build/meta.data',
-    frameworkUrl: '/build/meta.framework.js',
-    codeUrl: '/build/meta.wasm',
+    loaderUrl: '/build/meta10.loader.js',
+    dataUrl: '/build/meta10.data',
+    frameworkUrl: '/build/meta10.framework.js',
+    codeUrl: '/build/meta10.wasm',
     });
 
 

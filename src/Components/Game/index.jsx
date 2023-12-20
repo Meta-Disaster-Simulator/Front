@@ -197,6 +197,7 @@ const Game = () => {
       }, [sendNew]);
       const UnityFirstSetting = useCallback(() => {
         console.log("유니티->리액트(실행위치) : 최초 세팅 ");
+        connect();
         const userData = {
           nickname: unityNickName,
           score: unityScore
@@ -211,7 +212,7 @@ const Game = () => {
     }
   
     useEffect(() => {
-      requestFullscreen(true); // 전체화면 버튼
+      // requestFullscreen(true); // 전체화면 버튼
       const handleBeforeUnload = (event) => {
         disconnect();
       };
@@ -244,9 +245,6 @@ const Game = () => {
   return (
     <div className="wrapping">
       <Wrapper>
-            <FullscreenButton onClick={connected ? disconnect : connect}>
-              {connected ? '연결 끊기' : '연결하기'}
-            </FullscreenButton>
             <FullscreenButton onClick={handleClickEnterFullscreen}>
                 전체화면 전환
             </FullscreenButton>

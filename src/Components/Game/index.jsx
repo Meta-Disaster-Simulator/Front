@@ -52,10 +52,10 @@ const Game = () => {
     sendMessage, // unity 함수를 호출하기 위한 sendMessage 추가
     UNSAFE__detachAndUnloadImmediate: detachAndUnloadImmediate,
   } = useUnityContext({
-    loaderUrl: '/build/meta.loader.js',
-    dataUrl: '/build/meta.data',
-    frameworkUrl: '/build/meta.framework.js',
-    codeUrl: '/build/meta.wasm',
+    loaderUrl: '/build/meta2.loader.js',
+    dataUrl: '/build/meta2.data',
+    frameworkUrl: '/build/meta2.framework.js',
+    codeUrl: '/build/meta2.wasm',
     });
 
     const api = axios.create({
@@ -195,7 +195,16 @@ const Game = () => {
         setnew(eventData);
         sendNew(eventData); // 유니티 데이터를 서버로 
       }, [sendNew]);
-      
+      const UnityFirstSetting = useCallback(() => {
+        console.log("유니티->리액트(실행위치) : 최초 세팅 ");
+        const userData = {
+          nickname: unityNickName,
+          score: unityScore
+        };
+        const jsonUserData = JSON.stringify(userData);
+        console.log(jsonUserData);
+        sendMessage('GameMode', 'StatfromReact', jsonUserData);
+      }, );
     // 전체화면 버튼 처리
     function handleClickEnterFullscreen() {
       requestFullscreen(true);
@@ -210,6 +219,7 @@ const Game = () => {
       // Adding event listeners
       addEventListener("newplay", UnityNewEvent);
       addEventListener("info", UnityInfoEvent);
+      addEventListener("BuildComplete", UnityFirstSetting);
       const userData = {
         nickname: unityNickName,
         score: unityScore

@@ -191,7 +191,10 @@ const Login = () => {
     setLoading(false);
     if (error.response && error.response.status === 403) {
       alert("[Error:403] 로그인 정보를 다시 입력하세요.");
-    } else {
+    } else if(error.response && error.response.status === 500){
+      alert("해당 아이디가 현재 로그인 중입니다.");
+    }
+    else {
       // 다른 종류의 에러 처리
       console.error("로그인 에러", error);
       setMsg("로그인에 실패했습니다. 서버 에러가 발생했습니다.");

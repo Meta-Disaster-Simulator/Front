@@ -44,7 +44,6 @@ const Game = () => {
     const [loading, setLoading] = useState(false);
     const [msg, setMsg] = useState("");
 
-
     const {
     unityProvider,
     requestFullscreen,
@@ -57,7 +56,6 @@ const Game = () => {
     dataUrl: '/build/meta2.data',
     frameworkUrl: '/build/meta2.framework.js',
     codeUrl: '/build/meta2.wasm',
-    onLoaded: () => setLoading(false), // 유니티가 로드되면 로딩 상태를 false로 설정
     });
 
     const api = axios.create({
@@ -104,41 +102,41 @@ const Game = () => {
   };
 
 
-  const disconnect = async () => {
+const disconnect = async () => {
     if (stompClient.current && connected) {
-      try {
-        await api.post("/logout", { userId });
-        // 성공적으로 로그아웃 처리 시 로컬 스토리지에서 관련 데이터 제거
-        localStorage.removeItem('pendingLogout');
-      } catch (error) {
-        // 요청 실패 시 로컬 스토리지에 저장
-        localStorage.setItem('pendingLogout', JSON.stringify({ userId }));
-      }
+    let body = {
+        "nickname" : unityNickName,
+        "score": unityScore
+    };
   
+      try {
+        const res = await api.post("/score", body)
+        console.log(res);
+        console.log(res.data);
+        if(res.status === 200) {
+          console.log("서버에 점수 갱신 성공");
+          setMsg("");
+        }
+      } catch(error) {
+        if (error.response && error.response.status === 403) {
+          alert("[403] 연결 끊기 에러");
+        } else {
+          console.error("연결끊기 에러", error);
+          setMsg("[??] 연결끊기 에러");
+        }
+      }
+      
+      // 구독 설정 후 메시지 전송
       const initJSON = {
         nickname: unityNickName,
         score: unityScore,
         islogin: false,
       };
-      stompClient.current.send("/topic/new", {}, JSON.stringify(initJSON));
+      stompClient.current.send("/topic/new", {}, JSON.stringify(initJSON)); // JSON 객체를 문자열로 변환하여 전송
       stompClient.current.disconnect();
       setConnected(false);
     }
   };
-  
-  // 페이지 로드 시 로컬 스토리지 확인
-  window.addEventListener('load', () => {
-    const pendingLogout = localStorage.getItem('pendingLogout');
-    if (pendingLogout) {
-      api.post("/logout", JSON.parse(pendingLogout))
-        .then(() => {
-          localStorage.removeItem('pendingLogout');
-        })
-        .catch((error) => {
-          console.error("로그아웃 재시도 실패", error);
-        });
-    }
-  });
 
     //유저의 상태 정보를 websocket(서버)으로 보내는 함수 (리액트->서버)
     const sendInfo = useCallback((eventData) => {
@@ -181,32 +179,9 @@ const Game = () => {
         console.log("데이터 저장(리액트)"+infostr);
         sendInfo(eventData); // 유니티 데이터를 서버로 
       }, [sendInfo]);
-      const UnityNewEvent = useCallback(async (eventData) => {
+      const UnityNewEvent = useCallback((eventData) => {
         const userinfo = JSON.parse(eventData);
         setunityScore(userinfo.score);
-
-        let body = {
-          "nickname" : unityNickName,
-          "score": unityScore
-        };
-    
-        try {
-          const res = await api.post("/score", body)
-          console.log(res);
-          console.log(res.data);
-          if(res.status === 200) {
-            console.log("서버에 점수 갱신 성공");
-            setMsg("");
-          }
-        } catch(error) {
-          if (error.response && error.response.status === 403) {
-            alert("[403] 연결 끊기 에러");
-          } else {
-            console.error("연결끊기 에러", error);
-            setMsg("[??] 연결끊기 에러");
-          }
-        }
-
         console.log("유니티->리액트(실행위치) : "+eventData);
         setnew(eventData);
         sendNew(eventData); // 유니티 데이터를 서버로 
@@ -225,7 +200,11 @@ const Game = () => {
     function handleClickEnterFullscreen() {
       requestFullscreen(true);
     }
-
+    function ScoreUpdate() {
+      console.log('유저 점수 : '+ unityScore);
+      disconnect();
+      window.close();
+    }
     function handleBeforeUnload() {
       console.log('웹소켓 연결 끊기 : '+ unityScore);
       disconnect();
@@ -262,25 +241,24 @@ const Game = () => {
 
   return (
     <div className="wrapping">
-      {loading ? (
-                <div>로딩 중...</div> // 로딩 화면
-            ) : (
-                <Wrapper>
-                    <Unity
-                        style={{
-                            width: '100%',
-                            height: '100%',
-                            justifySelf: "center",
-                            alignSelf: "center",
-                            margin: '0',
-                        }}
-                        unityProvider={unityProvider}
-                    />
-                    <FullscreenButton onClick={handleClickEnterFullscreen}>
-                        전체화면 전환
-                    </FullscreenButton>
-                </Wrapper>
-            )}
+      <Wrapper>
+            <Unity
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    justifySelf: "center",
+                    alignSelf: "center",
+                    margin: '0',
+                }}
+                unityProvider={unityProvider}
+            /> 
+            <FullscreenButton onClick={ScoreUpdate}>
+            저장하기
+        </FullscreenButton>
+            <FullscreenButton onClick={handleClickEnterFullscreen}>
+                전체화면 전환
+            </FullscreenButton>
+        </Wrapper>
     </div>
   );
 };

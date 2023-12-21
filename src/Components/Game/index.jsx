@@ -32,7 +32,6 @@ const Wrapper = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh; /* Full height of the viewport */
 `;
 
 const Game = () => {
@@ -53,11 +52,11 @@ const Game = () => {
     sendMessage, // unity 함수를 호출하기 위한 sendMessage 추가
     UNSAFE__detachAndUnloadImmediate: detachAndUnloadImmediate,
   } = useUnityContext({
-    loaderUrl: '/build/meta2.loader.js',
-    dataUrl: '/build/meta2.data',
-    frameworkUrl: '/build/meta2.framework.js',
-    codeUrl: '/build/meta2.wasm',
     onLoaded: () => setLoading(false), // 유니티가 로드되면 로딩 상태를 false로 설정
+    loaderUrl: '/build/meta1.loader.js',
+    dataUrl: '/build/meta1.data',
+    frameworkUrl: '/build/meta1.framework.js',
+    codeUrl: '/build/meta1.wasm',
     });
 
     const api = axios.create({
@@ -90,6 +89,12 @@ const Game = () => {
           sendMessage('GameMode', 'initfromReact', newpersn.body);
         }
       });
+      stompClient.current.subscribe('/topic/chat', chat => {
+        console.log("서버->리액트(실행위치)chat:  "+chat.body);
+        console.log("서버->리액트(실행위치)chat:  "+chat.body.command);
+        const receivedNew = JSON.parse(chat.body).command;
+        sendMessage('GameMode', 'ChatfromReact', receivedNew);
+      });
 
       // 구독 설정 후 메시지 전송
       const initJSON = {
@@ -105,40 +110,20 @@ const Game = () => {
 
 
   const disconnect = async () => {
-    if (stompClient.current && connected) {
-      try {
-        await api.post("/logout", { userId });
-        // 성공적으로 로그아웃 처리 시 로컬 스토리지에서 관련 데이터 제거
-        localStorage.removeItem('pendingLogout');
-      } catch (error) {
-        // 요청 실패 시 로컬 스토리지에 저장
-        localStorage.setItem('pendingLogout', JSON.stringify({ userId }));
-      }
-  
+    if (stompClient.current && connected) { 
       const initJSON = {
         nickname: unityNickName,
         score: unityScore,
         islogin: false,
       };
+      
       stompClient.current.send("/topic/new", {}, JSON.stringify(initJSON));
+      stompClient.current.send("/app/disconnect", {}, userId);
       stompClient.current.disconnect();
       setConnected(false);
+      console.log("Disconnected");
     }
   };
-  
-  // 페이지 로드 시 로컬 스토리지 확인
-  window.addEventListener('load', () => {
-    const pendingLogout = localStorage.getItem('pendingLogout');
-    if (pendingLogout) {
-      api.post("/logout", JSON.parse(pendingLogout))
-        .then(() => {
-          localStorage.removeItem('pendingLogout');
-        })
-        .catch((error) => {
-          console.error("로그아웃 재시도 실패", error);
-        });
-    }
-  });
 
     //유저의 상태 정보를 websocket(서버)으로 보내는 함수 (리액트->서버)
     const sendInfo = useCallback((eventData) => {
@@ -174,6 +159,13 @@ const Game = () => {
         }  
       }, [ connected]);
 
+      const sendchat = useCallback((eventData) => {
+        if (stompClient.current && connected) {
+          console.log("리액트(실행위치)->서버new : "+eventData);    
+          stompClient.current.send("/app/chat", {}, eventData); // JSON 객체를 문자열로 변환하여 전송
+        }  
+      }, [connected]);
+
       // 유니티에서 리액트로 데이터가 전이 될때 실행되는 로직
       const UnityInfoEvent = useCallback((eventData) => {
         console.log("유니티->리액트(실행위치) : "+eventData);    
@@ -181,6 +173,10 @@ const Game = () => {
         console.log("데이터 저장(리액트)"+infostr);
         sendInfo(eventData); // 유니티 데이터를 서버로 
       }, [sendInfo]);
+      const UnityChatEvent = useCallback((eventData) => {
+        console.log("유니티->리액트(실행위치) : "+eventData);   
+        sendchat(eventData); // 유니티 데이터를 서버로 
+      }, [sendchat]);
       const UnityNewEvent = useCallback(async (eventData) => {
         const userinfo = JSON.parse(eventData);
         setunityScore(userinfo.score);
@@ -231,6 +227,7 @@ const Game = () => {
       disconnect();
     }
     useEffect(() => {
+      console.log(`Loading 상태: ${loading}`);
       // requestFullscreen(true); // 전체화면 버튼
       // 윈도우 종료 시
       console.log('user : score : ' + unityScore);
@@ -239,6 +236,7 @@ const Game = () => {
       addEventListener("newplay", UnityNewEvent);
       addEventListener("info", UnityInfoEvent);
       addEventListener("BuildComplete", UnityFirstSetting);
+      addEventListener("chat", UnityChatEvent);
       const userData = {
         nickname: unityNickName,
         score: unityScore
@@ -252,23 +250,25 @@ const Game = () => {
           window.removeEventListener('beforeunload', handleBeforeUnload);
           removeEventListener("info", UnityInfoEvent);
           removeEventListener("newplay", UnityNewEvent);
+          removeEventListener("BuildComplete", UnityFirstSetting);
+          removeEventListener("chat", UnityChatEvent);
           if (unityProvider && detachAndUnloadImmediate && typeof detachAndUnloadImmediate === "function") {
               detachAndUnloadImmediate().catch((reason) => {
                   console.error(reason);
               });
           }
       };
-  }, [requestFullscreen, unityProvider, detachAndUnloadImmediate, addEventListener, removeEventListener, UnityInfoEvent, UnityNewEvent]);
+  }, [loading, requestFullscreen, unityProvider, detachAndUnloadImmediate, addEventListener, removeEventListener, UnityInfoEvent, UnityNewEvent, UnityChatEvent]);
 
   return (
     <div className="wrapping">
       {loading ? (
-                <div>로딩 중...</div> // 로딩 화면
+                <div>로딩 중... <p>{loading.toString()}</p></div>
             ) : (
                 <Wrapper>
                     <Unity
                         style={{
-                            width: '100%',
+                            width: '90%',
                             height: '100%',
                             justifySelf: "center",
                             alignSelf: "center",

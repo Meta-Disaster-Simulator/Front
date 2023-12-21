@@ -53,10 +53,10 @@ const Game = () => {
     UNSAFE__detachAndUnloadImmediate: detachAndUnloadImmediate,
   } = useUnityContext({
     onLoaded: () => setLoading(false), // 유니티가 로드되면 로딩 상태를 false로 설정
-    loaderUrl: '/build/meta1.loader.js',
-    dataUrl: '/build/meta1.data',
-    frameworkUrl: '/build/meta1.framework.js',
-    codeUrl: '/build/meta1.wasm',
+    loaderUrl: '/build/uniy.loader.js',
+    dataUrl: '/build/uniy.data',
+    frameworkUrl: '/build/uniy.framework.js',
+    codeUrl: '/build/uniy.wasm',
     });
 
     const api = axios.create({
@@ -116,7 +116,10 @@ const Game = () => {
         score: unityScore,
         islogin: false,
       };
-      
+      var dto = {
+        'command' : unityNickName+" left the lobby."
+      }
+      stompClient.current.send("/topic/chat", {},JSON.stringify(dto));
       stompClient.current.send("/topic/new", {}, JSON.stringify(initJSON));
       stompClient.current.send("/app/disconnect", {}, userId);
       stompClient.current.disconnect();
@@ -149,12 +152,13 @@ const Game = () => {
       //유저의 상태 정보를 websocket으로 보내는 함수(리액트->서버)
       const sendNew = useCallback((eventData) => {
         if (stompClient.current && connected) {
-          var dto = {
-            'command' : unityNickName+" entered the lobby."
-          }
-
           console.log("리액트(실행위치)->서버new : "+eventData);
-          stompClient.current.send("/topic/chat", {},JSON.stringify(dto)); // JSON 객체를 문자열로 변환하여 전송
+          if(JSON.parse(eventData).islogin){
+            var dto = {
+              'command' : unityNickName+" entered the lobby."
+            }
+            stompClient.current.send("/topic/chat", {},JSON.stringify(dto)); // JSON 객체를 문자열로 변환하여 전송
+          }
           stompClient.current.send("/topic/new", {},eventData); // JSON 객체를 문자열로 변환하여 전송
         }  
       }, [ connected]);
@@ -168,7 +172,7 @@ const Game = () => {
 
       // 유니티에서 리액트로 데이터가 전이 될때 실행되는 로직
       const UnityInfoEvent = useCallback((eventData) => {
-        console.log("유니티->리액트(실행위치) : "+eventData);    
+        console.log("유니티->리액트(실행위치) : "+eventData);
         setinfo(eventData);
         console.log("데이터 저장(리액트)"+infostr);
         sendInfo(eventData); // 유니티 데이터를 서버로 

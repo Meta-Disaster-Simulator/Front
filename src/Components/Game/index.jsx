@@ -149,12 +149,12 @@ const Game = () => {
       //유저의 상태 정보를 websocket으로 보내는 함수(리액트->서버)
       const sendNew = useCallback((eventData) => {
         if (stompClient.current && connected) {
-          var dto = { // 예시
-            'nickname' : 'kangmingi',
-            'score':1000,
-            'islogin':true
+          var dto = {
+            'command' : unityNickName+" entered the lobby."
           }
-          console.log("리액트(실행위치)->서버new : "+eventData);    
+
+          console.log("리액트(실행위치)->서버new : "+eventData);
+          stompClient.current.send("/topic/chat", {},JSON.stringify(dto)); // JSON 객체를 문자열로 변환하여 전송
           stompClient.current.send("/topic/new", {},eventData); // JSON 객체를 문자열로 변환하여 전송
         }  
       }, [ connected]);
@@ -180,7 +180,6 @@ const Game = () => {
       const UnityNewEvent = useCallback(async (eventData) => {
         const userinfo = JSON.parse(eventData);
         setunityScore(userinfo.score);
-
         let body = {
           "nickname" : unityNickName,
           "score": unityScore
@@ -209,6 +208,7 @@ const Game = () => {
       }, [sendNew]);
       const UnityFirstSetting = useCallback(() => {
         console.log("유니티->리액트(실행위치) : 최초 세팅 ");
+        
         const userData = {
           nickname: unityNickName,
           score: unityScore

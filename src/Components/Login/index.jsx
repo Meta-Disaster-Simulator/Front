@@ -231,6 +231,11 @@ const Login = () => {
         placeholder="비밀번호"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        onKeyPress={(e) => {
+          if (e.key === 'Enter') {
+            handleSubmit(e);
+          }
+        }}
       />
       <StyledButton onClick={handleSubmit} disabled={loading}>로그인</StyledButton>
       <StyledLink to="/register">회원가입</StyledLink>

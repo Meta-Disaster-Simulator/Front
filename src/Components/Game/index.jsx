@@ -27,7 +27,7 @@ const FullscreenButton = styled.button`
 
 // 가운데 정렬
 const Wrapper = styled.div`
-  margin: 20px;
+  margin: 0px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -36,7 +36,7 @@ const Wrapper = styled.div`
 `;
 
 const Game = () => {
-    const { unityScore, userId, unityNickName } = useUser();
+    const { unityScore, userId, unityNickName, setunityScore } = useUser();
     const [infostr, setinfo] = useState(""); // playerDTO
     const [newstr, setnew] = useState(""); // newDTO
     const [connected, setConnected] = useState(false);
@@ -137,7 +137,6 @@ const Game = () => {
 
       
       stompClient.current.disconnect();
-      setConnected(false);
       // 구독 설정 후 메시지 전송
       const initJSON = {
         nickname: unityNickName,
@@ -145,7 +144,7 @@ const Game = () => {
         islogin: false,
       };
       stompClient.current.send("/topic/new", {}, JSON.stringify(initJSON)); // JSON 객체를 문자열로 변환하여 전송
-
+      setConnected(false);
     }
   };
     
@@ -165,10 +164,11 @@ const Game = () => {
           'is_walk':false,
           'is_run':false
       }
-        console.log("리액트(실행위치)->서버 : "+eventData);    
+        console.log("리액트(실행위치)->서버 : "+eventData);
         stompClient.current.send("/topic/info", {}, eventData); // JSON 객체를 문자열로 변환하여 전송
       }
     }, [ connected]);
+
       //유저의 상태 정보를 websocket으로 보내는 함수(리액트->서버)
       const sendNew = useCallback((eventData) => {
         if (stompClient.current && connected) {
@@ -190,14 +190,14 @@ const Game = () => {
         sendInfo(eventData); // 유니티 데이터를 서버로 
       }, [sendInfo]);
       const UnityNewEvent = useCallback((eventData) => {
+        const userinfo = JSON.parse(eventData);        
+        setunityScore(userinfo.score);
         console.log("유니티->리액트(실행위치) : "+eventData);
-        const userinfo = JSON.parse(eventData);
         setnew(eventData);
         sendNew(eventData); // 유니티 데이터를 서버로 
       }, [sendNew]);
       const UnityFirstSetting = useCallback(() => {
         console.log("유니티->리액트(실행위치) : 최초 세팅 ");
-        connect();
         const userData = {
           nickname: unityNickName,
           score: unityScore
@@ -210,12 +210,16 @@ const Game = () => {
     function handleClickEnterFullscreen() {
       requestFullscreen(true);
     }
-  
+    function a() {
+      console.log('유저 점수 : '+ unityScore);
+    }
+    const handleBeforeUnload = (event) => {
+      disconnect();
+    };
     useEffect(() => {
       // requestFullscreen(true); // 전체화면 버튼
-      const handleBeforeUnload = (event) => {
-        disconnect();
-      };
+      // 윈도우 종료 시
+      console.log('user : score : ' + unityScore);
       window.addEventListener('beforeunload', handleBeforeUnload);
       // Adding event listeners
       addEventListener("newplay", UnityNewEvent);
@@ -228,7 +232,7 @@ const Game = () => {
       const jsonUserData = JSON.stringify(userData);
       console.log(jsonUserData);
       sendMessage('GameMode', 'StatfromReact', jsonUserData);
-
+      connect();
         // Cleanup function
         return () => {
           window.removeEventListener('beforeunload', handleBeforeUnload);
@@ -245,18 +249,22 @@ const Game = () => {
   return (
     <div className="wrapping">
       <Wrapper>
-            <FullscreenButton onClick={handleClickEnterFullscreen}>
-                전체화면 전환
-            </FullscreenButton>
             <Unity
                 style={{
                     width: '100%',
                     height: '100%',
                     justifySelf: "center",
                     alignSelf: "center",
+                    margin: '0',
                 }}
                 unityProvider={unityProvider}
-            />
+            /> 
+            <FullscreenButton onClick={a}>
+            점수 확인
+        </FullscreenButton>
+            <FullscreenButton onClick={handleClickEnterFullscreen}>
+                전체화면 전환
+            </FullscreenButton>
         </Wrapper>
     </div>
   );

@@ -52,7 +52,6 @@
 <tr>
  <td align="center">Design</td>
  <td>
-  <img src="https://img.shields.io/badge/ESLint-4B32C3?style=for-the-badge&logo=ESLint&logoColor=ffffff"/> &nbsp 
    <img src="https://img.shields.io/badge/Styled-components-DB7093?style=for-the-badge&logo=styledcomponents&logoColor=white"> &nbsp 
     <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=Figma&logoColor=white"/>&nbsp 
   </td>
@@ -102,7 +101,3 @@ $ npm start
 ### Multi flow
 
 [멀티 실행구조](https://github.com/Kyxxn/React_Metaverse/assets/129862357/8e81d46d-bbc0-4971-9702-78d3eca5a154)
-
-## 사용된 기술스택   
-<img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=white"> <img src="https://img.shields.io/badge/Styled-components-DB7093?style=for-the-badge&logo=styledcomponents&logoColor=white"> <img src="https://img.shields.io/badge/Unity-000000?style=for-the-badge&logo=unity&logoColor=white">
-</div>

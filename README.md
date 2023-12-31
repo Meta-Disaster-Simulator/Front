@@ -21,7 +21,7 @@
 
 | 이름 |  박효준  |
 | :------------: | :------------: |
-|  | ![발표사진](https://github.com/Kyxxn/React_Metaverse/assets/129862357/440e93ab-233b-47ef-9637-a4515d13d915) |
+|  | <img src="https://github.com/Kyxxn/React_Metaverse/assets/129862357/440e93ab-233b-47ef-9637-a4515d13d915" width="150"/> |
 | 깃허브 | [@Kyxxn](https://github.com/Kyxxn) |
 
 <br>

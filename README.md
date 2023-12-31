@@ -17,12 +17,6 @@
 
 ## 🧑‍💻 팀원 소개
 
-| 이름 |  구현우  | 이수화 |
-| :------------: | :------------: | :-----------: |  
-|  | <img src="https://user-images.githubusercontent.com/72565083/230766542-b2898bf8-e748-4697-9549-e6925699f9be.png" width="150"/> | <img src="https://user-images.githubusercontent.com/72565083/230766777-d4f9acb2-b752-47e8-8011-fb354328ff2c.png" width="150"/> |
-| 깃허브 | [@GHWooo](https://github.com/GHWooo) | [@rosielsh](https://github.com/rosielsh) |
-| 담당 페이지 | Main<br/>My<br/>Map<br/> | Login<br/>Signup<br/>Board<br/>Bookmark<br/> | 
-
 <br>
 
 ## 🗓️ 개발 기간

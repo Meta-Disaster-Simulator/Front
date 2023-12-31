@@ -81,7 +81,6 @@
 ### 설치
 ```
 $ git clone https://github.com/Kyxxn/React_Metaverse.git
-$ ㅇㅁㄴㅇ
 $ cd React_Metaverse
 ```
 

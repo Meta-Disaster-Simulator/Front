@@ -1,70 +1,111 @@
-# Getting Started with Create React App
+<div>
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+  <div align="center">
+      <img width="329" alt="스크린샷 2023-12-26 18 14 51" src="https://github.com/Kyxxn/React_Metaverse/assets/129862357/f982eb8e-7665-40eb-8f95-b55bb0bdbd6b">
+  </div>
 
-## Available Scripts
+## ⚡️ 프로젝트 소개
 
-In the project directory, you can run:
+<div align="center">
+  <div>메타 재난 시뮬레이션은 <b>국민들이 재난 사고가 발생하였을 때 대피요령을 잘 익히고 있는지,<br> 안전한 대피를 할 수 있는지</b>에 대한 환경을 제공하는 서비스입니다.</div>
+  <div><b>확장형 하이브리드 메타버스 플랫폼</b>으로 웹, 앱에서 실제와 비슷한 환경을 경험해볼 수 있습니다.</div>
+  <div>🏆2023년 메타버스 수도 경북 해커톤 우수상 수상 프로젝트 입니다.🏆</div>
+</div>
+<br>
 
-### `npm start`
+<!-- ## 🪄 배포 주소 --> 
+<!-- 배포 주소 작성 -->
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 🧑‍💻 팀원 소개
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `npm test`
+| 이름 |  박효준  |
+| :------------: | :------------: |
+|  | <img src="https://github.com/Kyxxn/React_Metaverse/assets/129862357/440e93ab-233b-47ef-9637-a4515d13d915" width="150"/> |
+| 깃허브 | [@Kyxxn](https://github.com/Kyxxn) |
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+<br>
 
-### `npm run build`
+## 🗓️ 개발 기간
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+||기간|
+|:---:|:---:|
+|기획 및 설계|2023.11.19 ~ 2023.12.01|
+|개발|2023.11.20 ~ |
+|서비스 배포|2023.12.21|
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+<br>
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## ⚒️ 기술 스택
 
-### `npm run eject`
+<table>
+<tr>
+ <td align="center">Language</td>
+ <td>
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=JavaScript&logoColor=ffffff"/>
+ </td>
+</tr>
+<tr>
+ <td align="center">Library</td>
+ <td>
+  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=ffffff"/>&nbsp  
+</tr>
+<tr>
+ <td align="center">Package Manager</td>
+ <td>
+    <img src="https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white">&nbsp 
+  </td>
+</tr>
+<tr>
+ <td align="center">Design</td>
+ <td>
+   <img src="https://img.shields.io/badge/Styled-components-DB7093?style=for-the-badge&logo=styledcomponents&logoColor=white"> &nbsp 
+    <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=Figma&logoColor=white"/>&nbsp 
+  </td>
+</tr>
+<tr>
+ <td align="center">Collaboration</td>
+ <td>
+    <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=Git&logoColor=white"/>&nbsp 
+    <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white"/>&nbsp
+ </td>
+</table>
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+<br>
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🏃 시작 가이드
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+<!-- ### 요구 사항
+누군가 clone해서 실행하려고 할 때 필요한 요구사항 및 버전 기재 
+1. Node.js
+2. Npm 
+<br> -->
+웹 로그인 후 유니티 환경에 접속하여 렌더링합니다.
+<br>
+렌더링된 유니티 환경의 로비 씬에서 리스폰 -> 대피 시나리오 4개 중 선택할 수 있습니다.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-## Learn More
+### 설치
+```
+$ git clone https://github.com/Kyxxn/React_Metaverse.git
+$ cd React_Metaverse
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 실행
+```
+$ npm install
+$ npm start
+```
+### 배포링크
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+[메타 재난 시뮬레이션](http://3.36.87.32:3000/)  
 
-### Code Splitting
+<br>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## FLOW
+### Full flow
+<img width="758" alt="Flow" src="https://github.com/Kyxxn/React_Metaverse/assets/129862357/d83d230b-169d-4e28-97d9-991557dd63b8">
 
-### Analyzing the Bundle Size
+### Multi flow
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+[멀티 실행구조](https://github.com/Kyxxn/React_Metaverse/assets/129862357/8e81d46d-bbc0-4971-9702-78d3eca5a154)
